@@ -82,7 +82,51 @@ struct ParseTree* obj_to_parsetree(struct Object* o) {
     return NULL;   // To satisfy type-checker
 }
 
-void print_obj(struct Object* o) {}
+static int quoted = 0;
+void print_obj(struct Object* o) {
+    switch (o->type) {
+        case INT:
+            printf("%d", o->i);
+            return;
+        case DOUBLE:
+            printf("%g", o->d);
+            return;
+        case BOOL:
+            printf("%s", o->b ? "#t" : "#f");
+            return;
+        case STRING:
+            printf("\"%s\"", o->s);
+            return;
+        case SYMBOL:
+            if (!quoted) printf("'");
+            printf("%s", o->s);
+            return;
+        case PAIR:
+            if (!quoted++) printf("'");
+            printf("(");
+            while (o->type == PAIR) {
+                print_obj(o->pair->car);
+                printf(" ");
+                o = o->pair->cdr; 
+            }
+            if (o->type == NIL)
+                printf("\b)");
+            else {
+                printf(". ");
+                print_obj(o);
+                printf(")");
+            }
+            quoted--;
+            return;
+        case NIL:
+            if (!quoted) printf("'");
+            printf("()");
+            return;
+        case FUNCTION:
+            printf("<procedure>");     // Maybe print out define/lambda syntax of function? Consistent with the return value evaluating to itself...
+            return;
+    }
+}
 
 struct Record* new_record(char* varname, struct Object* obj) {
     struct Record* ret = malloc(sizeof(struct Record));
@@ -109,7 +153,7 @@ struct Object* env_get(struct Env* e, char* varname) {
     while (e != NULL) {
         struct Scope* s = e->scope;
         while (s != NULL)
-            if (s->rec->varname == varname)
+            if (strcmp(s->rec->varname, varname) == 0)
                 return s->rec->obj;
             else
                 s = s->next;
@@ -118,24 +162,20 @@ struct Object* env_get(struct Env* e, char* varname) {
     return NULL;      // TODO: Add error handling
 }
 
+static struct Env* _current_env;
+
 struct Env* child(struct Env* parent) {
     struct Env* ret = malloc(sizeof(struct Env));
-    ret->referred = 1;
     ret->scope = NULL;
     ret->upper = parent;
+    _current_env = ret;
     return ret;
 }
 
-void freeze(struct Env* current) {
-    while (current != NULL) {
-        current->referred++;
-        current = current->upper;
-    }
+void pop_env(void) {
+    _current_env = _current_env->upper;
 }
 
-void unfreeze(struct Env* current) {
-    while (current != NULL) {
-        current->referred--;
-        current = current->upper;
-    }
+struct Env* get_current_environment(void) {
+    return _current_env;
 }

@@ -1,5 +1,7 @@
 #include "lexer.h"
 
+static struct Token* _pushed_back = NULL;
+
 struct Token* get_next_token(char** tape) {
     struct Token* tok;
     if (_pushed_back != NULL) {

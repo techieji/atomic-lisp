@@ -17,7 +17,6 @@ struct Token {
     };
 };
 
-static struct Token* _pushed_back = NULL;
 
 struct Token* get_next_token(char** tape);  // Note: after lex is done, will return infinite stream of EOFs
 

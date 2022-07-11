@@ -11,3 +11,5 @@
 
 void test_lexer(char* s);
 void test_parser(char* s);
+void test_objects(char* s);
+void test_runtime_and_stl(char* s);

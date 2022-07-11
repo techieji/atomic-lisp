@@ -34,13 +34,13 @@ struct ParseTree* parse(char** tape) {
                     tree = parse_tree(tape, tree);
                     break;
                 case '\'':
-                    tree = quote(parse_tree(tape, tree));
+                    tree = quote(parse(tape));
                     break;
                 case '`':
-                    tree = quasiquote(parse_tree(tape, tree));
+                    tree = quasiquote(parse(tape));
                     break;
                 case ',':
-                    tree = unquote(parse_tree(tape, tree));
+                    tree = unquote(parse(tape));
                     break;
                 default:;
                     puts("ERROR on parser.c:38");

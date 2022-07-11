@@ -39,5 +39,5 @@ void print_parsetree(struct ParseTree* tree);
 
 // For internal use
 void append_to_branch_list(struct BranchList** p, struct ParseTree* t);
-struct ParseTree* wrap(struct ParseTree* new, struct ParseTree* whole);
+struct ParseTree* wrap(struct ParseTree* new_o, struct ParseTree* whole);
 void _print_parsetree(struct ParseTree* tree, char* indent);
