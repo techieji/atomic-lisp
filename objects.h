@@ -92,6 +92,9 @@ struct Env* child(struct Env* parent);          // Creates a new environment wit
 void pop_env(void);
 struct Env* get_current_environment(void);
 
+void print_all_variables(struct Env* e);
+void print_scope(struct Scope* s);
+
 ///////////////////////
 // Optional Features //
 ///////////////////////

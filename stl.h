@@ -4,8 +4,13 @@
 #include "runtime.h"
 
 #define DECLARE(fnname) struct Object* fnname (struct ArgList* al)
+#define EXPOSE(kind, fn_name, exposed_name) \
+                fn = make_fn( kind ); \
+                fn->fn->code.native_fn = fn_name; \
+                env_bind(e, new_record(exposed_name, fn));
 
 void load_stl(struct Env* e);
+struct Object* make_fn(enum Functionkind kind);
 
 /////////////////////
 //  Special forms  //
@@ -29,6 +34,11 @@ DECLARE(defmacro);
 
 DECLARE(and);
 DECLARE(or);
+DECLARE(car);
+DECLARE(cdr);
 DECLARE(display);
 DECLARE(newline);
+DECLARE(plus);
+DECLARE(exit_);
+DECLARE(display_variables);
 // DECLARE(the_environment);        // Implement after environment is struct Object*

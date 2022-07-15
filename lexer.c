@@ -66,7 +66,7 @@ struct Token* get_next_token(char** tape) {
 parse_symbol:;
     // Must be a symbol (varname)
     int i;
-    for (i = 0; strchr(" ()'`,#", *(*tape + i)) == NULL; i++);
+    for (i = 0; strchr("()'`,#", *(*tape + i)) == NULL && !isspace(*(*tape + i)); i++);
     tok->type = TOKEN_SYMBOL;
     tok->s = malloc((i + 1) * sizeof(char));
     strncpy(tok->s, *tape, i);

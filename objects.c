@@ -136,6 +136,7 @@ struct Record* new_record(char* varname, struct Object* obj) {
 }
 
 void env_bind(struct Env* e, struct Record* record) {
+    printf("Varname being bound: %s\n", record->varname);
     if (e->scope == NULL) {
         e->scope = malloc(sizeof(struct Scope));
         e->scope->rec = record;
@@ -152,13 +153,16 @@ void env_bind(struct Env* e, struct Record* record) {
 struct Object* env_get(struct Env* e, char* varname) {
     while (e != NULL) {
         struct Scope* s = e->scope;
-        while (s != NULL)
+        while (s != NULL) {
+            //printf("On var %s\n", s->rec->varname);
             if (strcmp(s->rec->varname, varname) == 0)
                 return s->rec->obj;
             else
                 s = s->next;
+        }
         e = e->upper;
     }
+    printf("%s not found!!\n", varname);
     return NULL;      // TODO: Add error handling
 }
 
@@ -169,13 +173,40 @@ struct Env* child(struct Env* parent) {
     ret->scope = NULL;
     ret->upper = parent;
     _current_env = ret;
+    if (parent == NULL) puts("Creating top level...");
+    puts("NEW ENV");
+    print_scope(_current_env->scope);
     return ret;
 }
 
 void pop_env(void) {
     _current_env = _current_env->upper;
+    puts("POP ENV");
 }
 
 struct Env* get_current_environment(void) {
     return _current_env;
+}
+
+void print_all_variables(struct Env* e) {
+    puts("ENV INFO");
+    puts("=========");
+    int i;
+    struct Env* p;
+    for (i = 0, p = e; p != NULL; i++, p = p->upper);
+    printf("Layers: %d\n", i);
+    i = 1;
+    while (e != NULL) {
+        printf("SCOPE %i:\n", i);
+        print_scope(e->scope);
+        e = e->upper;
+        i++;
+    }
+}
+
+void print_scope(struct Scope* s) {
+    while (s != NULL) {
+        printf("Variable: %s\n", s->rec->varname);
+        s = s->next;
+    }
 }

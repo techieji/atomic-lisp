@@ -1,6 +1,7 @@
 #include "runtime.h"
 
 struct Object* run(struct ParseTree* pt, struct Env* e) {
+    // print_parsetree(pt);
     if (pt->type == TREE) {
         struct Object* fn = run(pt->branches->tree, e);
         // TODO: add error handling to check if is function
@@ -33,7 +34,7 @@ struct ArgList* branchlist_to_arglist_normal(struct BranchList* bl, struct Env* 
 struct ArgList* branchlist_to_arglist_macro(struct BranchList* bl) {
     struct ArgList* head = malloc(sizeof(struct ArgList));
     struct ArgList* tail = head;
-    for (struct BranchList* p = bl; p != NULL; p = bl->next) {
+    for (struct BranchList* p = bl; p != NULL; p = p->next) {
         tail->obj = parsetree_to_obj(p->tree);
         if (p->next == NULL)
             tail->next = NULL;
@@ -50,7 +51,7 @@ struct ArgList* branchlist_to_arglist_macro(struct BranchList* bl) {
 struct Object* call(struct Function* fn, struct ArgList* args) {
     struct Env* here = child(fn->env);
     if (fn->kind == NORMAL || fn->kind == MACRO) {
-        for (struct ArgList* argname = fn->args; argname != NULL || args != NULL; argname = argname->next, args = args->next)
+        for (struct ArgList* argname = fn->args; argname != NULL && args != NULL; argname = argname->next, args = args->next)
             env_bind(here, new_record(argname->argname, args->obj));
         return run(fn->code.code, here);
     } else
